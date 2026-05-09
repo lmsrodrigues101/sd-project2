@@ -8,6 +8,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import sd2526.trab.impl.discovery.Discovery;
 import sd2526.trab.impl.java.servers.AbstractServer;
+import sd2526.trab.impl.rest.filter.AuthenticationFilter;
 import sd2526.trab.impl.utils.IP;
 
 
@@ -23,6 +24,7 @@ public abstract class AbstractRestServer extends AbstractServer {
 	protected void start() {
 		ResourceConfig config = new ResourceConfig();
 		registerResources( config );
+		config.register(AuthenticationFilter.class);
 		try {
 			JdkHttpServerFactory.createHttpServer(
 					URI.create(serverURI.replace(IP.hostAddress(), INETADDR_ANY)),
@@ -38,6 +40,6 @@ public abstract class AbstractRestServer extends AbstractServer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	abstract void registerResources( ResourceConfig config );
 }
