@@ -13,7 +13,7 @@ import sd2526.trab.impl.utils.IP;
 
 
 public abstract class AbstractRestServer extends AbstractServer {
-	private static final String SERVER_BASE_URI = "http://%s:%s%s";
+	private static final String SERVER_BASE_URI = "https://%s:%s%s";
 	private static final String REST_CTX = "/rest";
 
 	protected AbstractRestServer(Logger log, String service, int port) {
@@ -21,17 +21,22 @@ public abstract class AbstractRestServer extends AbstractServer {
 	}
 
 	protected void start() {
-		
 		ResourceConfig config = new ResourceConfig();
-		
 		registerResources( config );
-		
-		JdkHttpServerFactory.createHttpServer( URI.create(serverURI.replace(IP.hostAddress(), INETADDR_ANY)), config);
-		
-		if( service != null )
-			Discovery.getInstance().announce(serviceName(), super.serverURI);
-		
-		Log.info(String.format("%s Server ready @ %s\n",  service, serverURI));
+		try {
+			JdkHttpServerFactory.createHttpServer(
+					URI.create(serverURI.replace(IP.hostAddress(), INETADDR_ANY)),
+					config,
+					javax.net.ssl.SSLContext.getDefault());
+
+			if (service != null)
+				Discovery.getInstance().announce(serviceName(), super.serverURI);
+
+			Log.info(String.format("%s Server ready @ %s\n", service, serverURI));
+		}catch(Exception e) {
+			System.out.println("Error starting server HTTPS: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 	
 	abstract void registerResources( ResourceConfig config );
