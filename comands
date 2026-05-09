@@ -1,0 +1,8 @@
+keytool -ext SAN=dns:users.ourorg0 -genkeypair -alias users.ourorg0 -keyalg RSA -validity 365 -keystore users.ourorg0-server.ks -storetype pkcs12
+keytool -exportcert -alias users.ourorg0 -keystore users.ourorg0-server.ks -file users.ourorg0.cert
+keytool -importcert -file users.ourorg0.cert -alias users.ourorg0 -keystore truststore.ks
+
+
+keytool -ext SAN=dns:messages0.ourorg0 -genkeypair -alias messages0.ourorg0 -keyalg RSA -validity 365 -keystore messages0.ourorg0-server.ks -storetype pkcs12
+keytool -exportcert -alias messages0.ourorg0 -keystore messages0.ourorg0-server.ks -file messages0.ourorg0.cert
+keytool -importcert -file messages0.ourorg0.cert -alias messages0.ourorg0 -keystore truststore.ks
