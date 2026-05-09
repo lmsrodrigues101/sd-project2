@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Logger;
 
+import io.grpc.BindableService;
 import sd2526.trab.api.java.Users;
 
 public class GrpcUsersServer extends AbstractGrpcServer {
@@ -16,16 +17,13 @@ public static final int PORT = 13456;
 	}
 
 	@Override
-	protected List<GrpcController> controllers(String uri) {
+	protected List<GrpcController> controllers() {
 		return List.of( new GrpcUsersController(), new GrpcAdminUsersController() );
 	}
 
+
 	public static void main(String[] args) {
-		try {
-			new GrpcUsersServer().start();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new GrpcUsersServer().start();
 	}
 
 

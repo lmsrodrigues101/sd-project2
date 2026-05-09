@@ -9,6 +9,7 @@ import sd2526.trab.api.User;
 import sd2526.trab.api.java.Result;
 import sd2526.trab.api.java.Users;
 import sd2526.trab.api.rest.RestUsers;
+import sd2526.trab.impl.rest.filter.AuthenticationFilter;
 
 public class RestUsersClient extends RestClient implements Users {
 
@@ -44,6 +45,7 @@ public class RestUsersClient extends RestClient implements Users {
 
 	private Result<String> doPostUser(User user) {
 		var r = target.request()
+				.header(AuthenticationFilter.HEADER_SECRET, System.getProperty("secret"))
 				.accept( MediaType.APPLICATION_JSON)
 				.post(Entity.entity(user, MediaType.APPLICATION_JSON));
 				
@@ -54,6 +56,7 @@ public class RestUsersClient extends RestClient implements Users {
 		var r = target.path( userId)
 				.queryParam(RestUsers.PWD, password)
 				.request()
+				.header(AuthenticationFilter.HEADER_SECRET, System.getProperty("secret"))
 				.accept( MediaType.APPLICATION_JSON)
 				.get();
 				
@@ -64,6 +67,7 @@ public class RestUsersClient extends RestClient implements Users {
 		var r = target.path( user)
 				.queryParam(RestUsers.PWD, password)
 				.request()
+				.header(AuthenticationFilter.HEADER_SECRET, System.getProperty("secret"))
 				.accept( MediaType.APPLICATION_JSON)
 				.put(Entity.entity(info, MediaType.APPLICATION_JSON));
 				
@@ -74,6 +78,7 @@ public class RestUsersClient extends RestClient implements Users {
 		var r = target.path( user)
 				.queryParam(RestUsers.PWD, password)
 				.request()
+				.header(AuthenticationFilter.HEADER_SECRET, System.getProperty("secret"))
 				.accept( MediaType.APPLICATION_JSON)
 				.delete();
 				
@@ -86,6 +91,7 @@ public class RestUsersClient extends RestClient implements Users {
 				.queryParam(RestUsers.NAME, user)
 				.queryParam(RestUsers.QUERY, pattern)
 				.request()
+				.header(AuthenticationFilter.HEADER_SECRET, System.getProperty("secret"))
 				.accept( MediaType.APPLICATION_JSON)
 				.get();
 		

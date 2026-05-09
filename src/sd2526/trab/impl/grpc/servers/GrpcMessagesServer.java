@@ -16,15 +16,12 @@ public static final int PORT = 14567;
 	}
 	
 	@Override
-	protected List<GrpcController> controllers(String uri) {
+	protected List<GrpcController> controllers() {
 		return List.of( new GrpcMessagesController(), new GrpcAdminMessagesController() );
 	}
 	
 	public static void main(String[] args) {
-		try {
-			new GrpcMessagesServer().start();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new GrpcMessagesServer().start();
+
 	}	
 }
