@@ -18,8 +18,8 @@ public class ZohoInitialRefreshToken {
         String grantCode = args[0];
 
         String body = "code=" + grantCode
-                + "&client_id=" + Zoho.CLIENT_ID
-                + "&client_secret=" + Zoho.CLIENT_SECRET
+                + "&client_id=" + JavaZohoMessages.CLIENT_ID
+                + "&client_secret=" + JavaZohoMessages.CLIENT_SECRET
                 + "&grant_type=authorization_code";
 
         HttpClient client = HttpClient.newHttpClient();

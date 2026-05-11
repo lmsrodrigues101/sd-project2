@@ -16,8 +16,6 @@ import sd2526.trab.impl.grpc.generated_java.UsersProtoBuf.DeleteUserArgs;
 import sd2526.trab.impl.grpc.generated_java.UsersProtoBuf.GetUserArgs;
 import sd2526.trab.impl.grpc.generated_java.UsersProtoBuf.SearchUsersArgs;
 import sd2526.trab.impl.grpc.generated_java.UsersProtoBuf.UpdateUserArgs;
-import io.grpc.Metadata;
-import io.grpc.stub.MetadataUtils;
 
 
 public class GrpcUsersClient extends GrpcClient implements Users {
@@ -27,12 +25,8 @@ public class GrpcUsersClient extends GrpcClient implements Users {
 	public GrpcUsersClient(String serverURI) {
 		super(serverURI);
 
-		Metadata metadata = new Metadata();
-		Metadata.Key<String> secretKey = Metadata.Key.of("x-shared-secret", Metadata.ASCII_STRING_MARSHALLER);
-		metadata.put(secretKey, System.getProperty("secret"));
 
-		var originalStub = GrpcUsersGrpc.newBlockingStub(super.channel);
-		this.stub = originalStub.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(metadata));
+		stub = GrpcUsersGrpc.newBlockingStub(channel);
 	}
 
 	@Override

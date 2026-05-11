@@ -8,11 +8,11 @@ import java.util.Map;
 final public class JSON {
 	private static final Gson gson = new Gson();
 	
-	synchronized public static final String encode( Object obj ) {
+	synchronized public static String encode( Object obj ) {
 		return gson.toJson( obj ) ;
 	}
 	
-	synchronized public static final <T> T decode( String json, Class<T> classOf) {
+	synchronized public static <T> T decode( String json, Class<T> classOf) {
 		return gson.fromJson(json, classOf);
 	}
 	

@@ -17,6 +17,7 @@ import io.netty.handler.ssl.SslContextBuilder;
 import sd2526.trab.impl.discovery.Discovery;
 import sd2526.trab.impl.grpc.interceptors.GrpcAuthenticationInterceptor;
 import sd2526.trab.impl.java.servers.AbstractServer;
+import sd2526.trab.impl.utils.IP;
 
 public abstract class AbstractGrpcServer extends AbstractServer {
 	private static final String SERVER_BASE_URI = "grpc://%s:%s%s";
@@ -26,16 +27,8 @@ public abstract class AbstractGrpcServer extends AbstractServer {
 	protected final int port;
 
 	protected AbstractGrpcServer(Logger log, String service, int port) {
-		super(log, service, String.format(SERVER_BASE_URI, getHostName(), port, GRPC_CTX));
+		super(log, service, String.format(SERVER_BASE_URI, IP.hostname(), port, GRPC_CTX));
 		this.port = port;
-	}
-
-	private static String getHostName() {
-		try {
-			return InetAddress.getLocalHost().getHostName();
-		} catch (Exception e) {
-			return "";
-		}
 	}
 
 	protected abstract List<GrpcController> controllers();
@@ -59,8 +52,7 @@ public abstract class AbstractGrpcServer extends AbstractServer {
 			).build();
 
 			NettyServerBuilder builder = NettyServerBuilder.forPort(port)
-					.sslContext(sslContext)
-					.intercept(new GrpcAuthenticationInterceptor());
+					.sslContext(sslContext);
 
 			for (BindableService s : controllers()) {
 				builder.addService(s);

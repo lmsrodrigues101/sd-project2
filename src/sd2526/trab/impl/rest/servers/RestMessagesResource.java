@@ -29,6 +29,10 @@ public class RestMessagesResource extends RestResource implements RestMessages, 
 	RestMessagesResource(boolean gw) {	
 		isGateway = gw;
 	}
+
+	public RestMessagesResource(Messages impl) {
+		this.impl = impl;
+	}
 	
 	@Override
 	public String postMessage(String pwd, Message msg) {

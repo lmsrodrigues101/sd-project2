@@ -16,6 +16,7 @@ import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
 import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContext;
 import io.grpc.netty.shaded.io.netty.handler.ssl.SslContextBuilder;
+import io.grpc.netty.shaded.io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 import sd2526.trab.api.java.Result;
 
 public class GrpcClient {
@@ -36,9 +37,9 @@ public class GrpcClient {
 			TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 			trustManagerFactory.init(trustStore);
 
-			SslContext context = GrpcSslContexts.configure(
-					SslContextBuilder.forClient().trustManager(trustManagerFactory)
-			).build();
+			SslContext context = GrpcSslContexts.forClient()
+					.trustManager(InsecureTrustManagerFactory.INSTANCE)
+					.build();
 
 			this.channel = NettyChannelBuilder
 					.forAddress(serverURI.getHost(), serverURI.getPort())

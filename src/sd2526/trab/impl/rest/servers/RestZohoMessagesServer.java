@@ -1,77 +1,39 @@
 package sd2526.trab.impl.rest.servers;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import sd2526.trab.api.zoho.JavaZohoMessages;
 
 import java.util.logging.Logger;
 
-import sd2526.trab.api.java.Messages;
-import sd2526.trab.api.zoho.*;
+// Verifica se o nome da tua classe base é este. Se for diferente, ajusta.
+public class RestZohoMessagesServer extends AbstractRestServer {
 
+    private static Logger Log = Logger.getLogger(RestZohoMessagesServer.class.getName());
+    public static final int PORT = 5567; // Porta base padrão
+    private static final String SERVICE = "Messages";
+    private final boolean shouldClean;
 
-public class RestZohoMessagesServer extends AbstractRestServer{
-
-    public static final int PORT = 14567; // Garante que usas uma porta diferente do Users
-    private static final Logger Log = Logger.getLogger(RestZohoMessagesServer.class.getName());
-
-
-    public RestZohoMessagesServer() {
-        super(Log, Messages.SERVICE_NAME, PORT);
+    public RestZohoMessagesServer(int port, boolean shouldClean) {
+        super(Log, SERVICE, port);
+        this.shouldClean = shouldClean;
     }
 
     @Override
-    void registerResources(ResourceConfig config) {
-
+    protected void registerResources(ResourceConfig config) {
+        var zohoImpl = JavaZohoMessages.getInstance(shouldClean);
+        config.register(new RestMessagesResource(zohoImpl));
     }
 
     public static void main(String[] args) {
         try {
-            // 1. Ler o parâmetro do Tester (se não houver, assume false)
-            boolean cleanState = false;
-            if (args.length > 0) {
-                cleanState = Boolean.parseBoolean(args[0]);
-            }
+            boolean shouldClean = args.length > 0 && args[0].equalsIgnoreCase("true");
+            int port = args.length > 1 ? Integer.parseInt(args[1]) : PORT;
 
-            // 2. Executar o Clean State se for true
-            if (cleanState) {
-                Log.info("Clean state solicitado (args[0] = true). A limpar a caixa de correio do Zoho...");
-                cleanMailbox();
-            } else {
-                Log.info("Arranque normal (args[0] = false). O estado da caixa de correio será mantido.");
-            }
-
-            // 3. Arrancar o servidor REST normalmente
-            new RestZohoMessagesServer().start();
+            Log.info("Arrancando o Proxy Zoho... Limpar Inbox? " + shouldClean);
+            new RestZohoMessagesServer(port, shouldClean).start();
 
         } catch (Exception e) {
-            Log.severe("Erro fatal ao iniciar servidor de Mensagens Zoho: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    private static void cleanMailbox() throws Exception {
-        Zoho zoho = Zoho.getInstance();
-        var account = zoho.getAccount();
-
-        if (account == null) {
-            throw new RuntimeException("Não foi possível aceder à conta Zoho. Verifica o Refresh Token.");
-        }
-        String accountId = account.accountId();
-        // Vamos buscar todos os emails
-        var emails = zoho.getMails(accountId);
-
-        if (emails != null && !emails.isEmpty()) {
-            Log.info("Encontrados " + emails.size() + " emails. A iniciar limpeza...");
-
-            for (var email : emails) {
-                // A API do Zoho precisa do accountId, folderId e messageId para apagar
-                boolean apagado = zoho.deleteEmail(accountId, email.folderId(), email.messageId());
-                if (!apagado) {
-                    Log.warning("Falha ao apagar o email ID: " + email.messageId());
-                }
-            }
-            Log.info("Caixa de correio limpa com sucesso!");
-        } else {
-            Log.info("A caixa de correio já está vazia.");
+            Log.severe("Erro ao arrancar o servidor Zoho: " + e.getMessage());
         }
     }
 }
