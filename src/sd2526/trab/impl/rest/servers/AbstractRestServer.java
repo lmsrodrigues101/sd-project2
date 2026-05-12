@@ -21,6 +21,7 @@ public abstract class AbstractRestServer extends AbstractServer {
 	}
 
 	protected void start() {
+
 		ResourceConfig config = new ResourceConfig();
 		registerResources( config );
 		try {
