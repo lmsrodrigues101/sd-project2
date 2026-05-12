@@ -8,7 +8,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 
 import sd2526.trab.impl.discovery.Discovery;
 import sd2526.trab.impl.java.servers.AbstractServer;
-import sd2526.trab.impl.rest.filter.AuthenticationFilter;
 import sd2526.trab.impl.utils.IP;
 
 

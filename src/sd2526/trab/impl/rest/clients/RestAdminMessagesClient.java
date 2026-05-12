@@ -7,6 +7,7 @@ import sd2526.trab.api.java.Result;
 import sd2526.trab.api.rest.RestMessages;
 import sd2526.trab.impl.api.java.AdminMessages;
 import sd2526.trab.impl.api.rest.RestAdminMessages;
+import sd2526.trab.impl.rest.filter.AuthenticationFilter;
 
 public class RestAdminMessagesClient extends RestClient implements AdminMessages {
 

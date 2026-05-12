@@ -2,6 +2,7 @@ package sd2526.trab.impl.rest.servers;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import sd2526.trab.api.zoho.JavaZohoMessages;
+import sd2526.trab.impl.rest.filter.AuthenticationFilter;
 
 import java.util.logging.Logger;
 

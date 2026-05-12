@@ -13,16 +13,22 @@ public class AuthenticationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
-        String officialSecret = System.getProperty("secret");
+        String path = requestContext.getUriInfo().getPath();
 
-        String receivedSecret = requestContext.getHeaderString(HEADER_SECRET);
+        // Apenas intercetar se o pedido for estritamente para as rotas de Admin
+        if (path.endsWith("admin") || path.contains("admin/")) {
 
-        if (receivedSecret == null || !receivedSecret.equals(officialSecret)) {
-            requestContext.abortWith(
-                    Response.status(Response.Status.FORBIDDEN)
-                            .entity("acess denied.")
-                            .build()
-            );
+            String officialSecret = System.getProperty("secret");
+            String receivedSecret = requestContext.getHeaderString(HEADER_SECRET);
+
+            // Bloqueia se o servidor tem um segredo definido e o cliente não o enviou corretamente
+            if (officialSecret != null && !officialSecret.equals(receivedSecret)) {
+                requestContext.abortWith(
+                        Response.status(Response.Status.FORBIDDEN)
+                                .entity("Acesso Negado: Falha na autenticação entre servidores.")
+                                .build()
+                );
+            }
         }
     }
 }
