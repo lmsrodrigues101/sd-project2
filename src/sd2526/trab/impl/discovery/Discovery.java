@@ -7,9 +7,8 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.URI;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
@@ -66,7 +65,7 @@ class DiscoveryImpl implements Discovery {
 
 	private static Discovery singleton;
 
-	private Map<String, Set<URI>> uris = new ConcurrentHashMap<>();
+	private final Map<String, TreeSet<ServerInfo>> storedAnnouncements = new ConcurrentHashMap<>();
 	
 	synchronized static Discovery getInstance() {
 		if (singleton == null) {
@@ -107,12 +106,20 @@ class DiscoveryImpl implements Discovery {
 	@Override
 	public URI[] knownUrisOf(String serviceName, int minEntries) {
 		while(true) {
-			var res = uris.getOrDefault(serviceName, Collections.emptySet());
-			if( res.size() >= minEntries )
-				return res.toArray( new URI[res.size()]);
-			else
+			long now = System.currentTimeMillis();
+			// apagar o servidor se ele nao anunciar-se em 5 segundos
+			storedAnnouncements.computeIfPresent(serviceName, (k, set) -> {
+				set.removeIf(info -> (now - info.lastAnnouncement) > DISCOVERY_ANNOUNCE_PERIOD * 5);
+				return set;
+			});
+
+			var res = storedAnnouncements.getOrDefault(serviceName, new TreeSet<>());
+			if( res.size() >= minEntries ) {
+				// Transforma o TreeSet ordenado num Array de URIs limpinho!
+				return res.stream().map(info -> info.uri).toArray(URI[]::new);
+			} else {
 				Sleep.ms(DISCOVERY_ANNOUNCE_PERIOD);
-				
+			}
 		}
 	}
 
@@ -132,8 +139,13 @@ class DiscoveryImpl implements Discovery {
 						if (parts.length == 2) {
 							var serviceName = parts[0];
 							var uri = URI.create(parts[1]);
-							uris.computeIfAbsent(serviceName, (k) -> ConcurrentHashMap.newKeySet()).add( uri );
-						}
+							storedAnnouncements.compute(serviceName, (k, v) -> {
+								if (v == null) v = new TreeSet<>();
+								ServerInfo newInfo = new ServerInfo(uri, System.currentTimeMillis());
+								v.remove(newInfo); // Remove o antigo (baseado no equals do URI)
+								v.add(newInfo);    // Adiciona o novo com o timestamp atualizado
+								return v;
+							});}
 
 					} catch (Exception x) {
 						x.printStackTrace();
@@ -149,6 +161,34 @@ class DiscoveryImpl implements Discovery {
 		try(var tmp = new DatagramSocket()){
 			tmp.connect(group);
 			return NetworkInterface.getByInetAddress(tmp.getLocalAddress());
+		}
+	}
+
+	class ServerInfo implements Comparable<ServerInfo> {
+		final URI uri;
+		final long lastAnnouncement;
+
+		public ServerInfo(URI uri, long lastAnnouncement) {
+			this.uri = uri;
+			this.lastAnnouncement = lastAnnouncement;
+		}
+
+		@Override
+		public int compareTo(ServerInfo other) {
+			return this.uri.toString().compareTo(other.uri.toString());
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) return true;
+			if (obj == null || getClass() != obj.getClass()) return false;
+			ServerInfo that = (ServerInfo) obj;
+			return uri.equals(that.uri);
+		}
+
+		@Override
+		public int hashCode() {
+			return uri.hashCode();
 		}
 	}
 
