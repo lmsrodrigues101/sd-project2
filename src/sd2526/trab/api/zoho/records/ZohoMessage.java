@@ -1,10 +1,3 @@
 package sd2526.trab.api.zoho.records;
 
-public record ZohoMessage(
-        String messageId,
-        String folderId,
-        String subject,
-        String summary,
-        String sender
-) {}
-
+public record ZohoMessage(String messageId, String folderId, String subject, String sender) {}
