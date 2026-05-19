@@ -1,4 +1,4 @@
-package sd2526.trab.api.zoho;
+package sd2526.trab.impl.zoho;
 
 import com.github.scribejava.core.model.OAuth2AccessToken;
 import com.github.scribejava.core.oauth.OAuth20Service;

@@ -1,4 +1,4 @@
-package sd2526.trab.api.zoho;
+package sd2526.trab.impl.zoho;
 import sd2526.trab.api.Message;
 import sd2526.trab.api.java.Result;
 

@@ -3,7 +3,6 @@ package sd2526.trab.impl.rest.servers;
 import java.util.logging.Logger;
 
 import org.glassfish.jersey.server.ResourceConfig;
-import sd2526.trab.impl.rest.filter.AuthenticationFilter;
 
 public class RestGatewayServer extends AbstractRestServer {
 

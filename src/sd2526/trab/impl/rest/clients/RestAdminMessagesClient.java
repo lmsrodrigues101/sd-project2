@@ -7,7 +7,6 @@ import sd2526.trab.api.java.Result;
 import sd2526.trab.api.rest.RestMessages;
 import sd2526.trab.impl.api.java.AdminMessages;
 import sd2526.trab.impl.api.rest.RestAdminMessages;
-import sd2526.trab.impl.rest.filter.AuthenticationFilter;
 
 public class RestAdminMessagesClient extends RestClient implements AdminMessages {
 
@@ -34,6 +33,7 @@ public class RestAdminMessagesClient extends RestClient implements AdminMessages
 		return super.toJavaResult( target
 				.path(RestAdminMessages.ADMIN)
 				.request()
+				.header("X-Shared-Secret", System.getProperty("secret"))
 				.post( Entity.entity(msg, MediaType.APPLICATION_JSON )));
 	}
 
@@ -42,6 +42,7 @@ public class RestAdminMessagesClient extends RestClient implements AdminMessages
 				.path(RestAdminMessages.ADMIN)
 				.path( mid )
 				.request()
+				.header("X-Shared-Secret", System.getProperty("secret"))
 				.delete());
 	}
 	
@@ -51,6 +52,7 @@ public class RestAdminMessagesClient extends RestClient implements AdminMessages
 				.path(RestAdminMessages.INBOX)
 				.path( name )
 				.request()
+				.header("X-Shared-Secret", System.getProperty("secret"))
 				.delete());
 	}
 }

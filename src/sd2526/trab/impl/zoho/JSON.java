@@ -1,4 +1,4 @@
-package sd2526.trab.api.zoho;
+package sd2526.trab.impl.zoho;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

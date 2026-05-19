@@ -10,7 +10,6 @@ import sd2526.trab.api.java.Result;
 import sd2526.trab.api.rest.RestUsers;
 import sd2526.trab.impl.api.java.AdminUsers;
 import sd2526.trab.impl.api.rest.RestAdminUsers;
-import sd2526.trab.impl.rest.filter.AuthenticationFilter;
 
 public class RestAdminUsersClient extends RestClient implements AdminUsers {
 

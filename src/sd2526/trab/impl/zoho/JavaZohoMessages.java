@@ -1,16 +1,13 @@
-package sd2526.trab.api.zoho;
+package sd2526.trab.impl.zoho;
 
 import com.github.scribejava.core.model.*;
 import com.github.scribejava.core.oauth.OAuth20Service;
 import sd2526.trab.api.Message;
-import sd2526.trab.api.User;
 import sd2526.trab.api.java.Messages;
 import sd2526.trab.api.java.Result;
 import sd2526.trab.impl.java.servers.JavaBaseService;
-import sd2526.trab.impl.java.clients.Clients;
 import sd2526.trab.impl.api.java.AdminMessages;
-import sd2526.trab.api.zoho.JSON;
-import sd2526.trab.api.zoho.records.*;
+import sd2526.trab.impl.zoho.records.*;
 
 import java.util.*;
 import java.util.logging.Logger;

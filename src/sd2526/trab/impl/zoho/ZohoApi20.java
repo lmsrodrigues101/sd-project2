@@ -1,4 +1,4 @@
-package sd2526.trab.api.zoho;
+package sd2526.trab.impl.zoho;
 
 import com.github.scribejava.core.builder.api.DefaultApi20;
 import com.github.scribejava.core.oauth2.bearersignature.BearerSignature;

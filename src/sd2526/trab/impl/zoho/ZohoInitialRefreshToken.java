@@ -1,4 +1,4 @@
-package sd2526.trab.api.zoho;
+package sd2526.trab.impl.zoho;
 
 import java.net.URI;
 import java.net.http.HttpClient;

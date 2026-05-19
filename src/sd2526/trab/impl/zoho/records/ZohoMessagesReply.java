@@ -1,4 +1,4 @@
-package sd2526.trab.api.zoho.records;
+package sd2526.trab.impl.zoho.records;
 import java.util.List;
 
 

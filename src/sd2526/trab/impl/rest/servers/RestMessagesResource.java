@@ -16,11 +16,11 @@ public class RestMessagesResource extends RestResource implements RestMessages, 
 	
 	static boolean isGateway = false;
 	
-	Messages impl;	
+	Messages impl;
 
 	synchronized Messages impl() {
 		if( impl == null )
-			impl = isGateway ? Clients.MessagesClient.get() : JavaMessages.getInstance();	
+			impl = isGateway ? Clients.MessagesClient.get() : JavaMessages.getInstance();
 		return impl;
 	}
 	
