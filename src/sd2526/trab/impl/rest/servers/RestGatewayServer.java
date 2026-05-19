@@ -3,6 +3,7 @@ package sd2526.trab.impl.rest.servers;
 import java.util.logging.Logger;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import sd2526.trab.impl.rest.filter.AuthenticationFilter;
 
 public class RestGatewayServer extends AbstractRestServer {
 
@@ -17,8 +18,7 @@ public class RestGatewayServer extends AbstractRestServer {
 	@Override
 	void registerResources(ResourceConfig config) {
 		config.registerInstances(new RestUsersResource(true), new RestMessagesResource(true));
-//		config.register(.getClass());
-//		config.register(.getClass());
+		config.register(AuthenticationFilter.class);
 	}
 
 	public static void main(String[] args) {
