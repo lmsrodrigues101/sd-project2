@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
 import sd2526.trab.api.java.Result;
 import sd2526.trab.impl.api.java.AdminUsers;
 import sd2526.trab.impl.grpc.generated_java.AdminUsersProtoBuf.CheckUsersArgs;
@@ -16,7 +18,15 @@ public class GrpcAdminUsersClient extends GrpcClient implements AdminUsers {
 
 	public GrpcAdminUsersClient(String serverURI) {
 		super(serverURI);
-		this.admin = GrpcAdminUsersGrpc.newBlockingStub( super.channel );	
+		Metadata headers = new Metadata();
+		String secret = System.getProperty("secret");
+
+		if (secret != null) {
+			headers.put(Metadata.Key.of("x-shared-secret", Metadata.ASCII_STRING_MARSHALLER), secret);
+		}
+
+		this.admin = GrpcAdminUsersGrpc.newBlockingStub( super.channel )
+				.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
 	}
 
 	@Override

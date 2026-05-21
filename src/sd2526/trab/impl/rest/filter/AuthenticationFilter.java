@@ -14,18 +14,13 @@ public class AuthenticationFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         String path = requestContext.getUriInfo().getPath();
-
-        // 1. SÓ APLICAMOS A SEGURANÇA ÀS ROTAS ENTRE SERVIDORES (Geralmente contêm "remote" ou "admin")
         if (path.contains("remote") || path.contains("admin")) {
-
-            // O segredo que o Tester nos passou quando arrancou o servidor
             String expectedSecret = System.getProperty("secret");
             String receivedSecret = requestContext.getHeaderString(SECRET_HEADER);
 
-            // Se o segredo não existir ou estiver errado, bloqueamos o acesso com 403 Forbidden!
             if (expectedSecret != null && !expectedSecret.equals(receivedSecret)) {
                 requestContext.abortWith(Response.status(Response.Status.FORBIDDEN)
-                        .entity("Acesso negado: Autenticação de Servidor Falhou.")
+                        .entity("Acess denied")
                         .build());
             }
         }

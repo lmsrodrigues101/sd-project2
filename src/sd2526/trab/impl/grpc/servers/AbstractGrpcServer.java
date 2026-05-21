@@ -15,7 +15,6 @@ import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 
 import sd2526.trab.impl.discovery.Discovery;
-import sd2526.trab.impl.grpc.interceptors.GrpcAuthenticationInterceptor;
 import sd2526.trab.impl.java.servers.AbstractServer;
 import sd2526.trab.impl.utils.IP;
 

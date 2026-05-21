@@ -2,6 +2,8 @@ package sd2526.trab.impl.grpc.clients;
 
 import static sd2526.trab.impl.grpc.common.DataModelAdaptor.Message_to_GrpcAdminMessage;
 
+import io.grpc.Metadata;
+import io.grpc.stub.MetadataUtils;
 import sd2526.trab.api.Message;
 import sd2526.trab.api.java.Result;
 import sd2526.trab.impl.api.java.AdminMessages;
@@ -16,7 +18,13 @@ public class GrpcAdminMessagesClient extends GrpcClient implements AdminMessages
 	
 	public GrpcAdminMessagesClient(String serverUrl) {
 		super(serverUrl);
-		this.admin = GrpcAdminMessagesGrpc.newBlockingStub( super.channel );	
+		Metadata headers = new Metadata();
+		String secret = System.getProperty("secret");
+		if (secret != null) {
+			headers.put(Metadata.Key.of("x-shared-secret", Metadata.ASCII_STRING_MARSHALLER), secret);
+		}
+		this.admin = GrpcAdminMessagesGrpc.newBlockingStub( super.channel )
+				.withInterceptors(MetadataUtils.newAttachHeadersInterceptor(headers));
 	}
 
 	@Override

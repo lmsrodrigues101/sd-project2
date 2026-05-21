@@ -27,6 +27,7 @@ public class RestAdminUsersClient extends RestClient implements AdminUsers {
 		return super.toJavaResult( target
 				.path(RestAdminUsers.ADMIN)
 				.request()
+				.header("X-Shared-Secret", System.getProperty("secret"))
 				.accept( MediaType.APPLICATION_JSON)
 				.post( Entity.json( names )), new GenericType<Set<String>>() {});
 	}
