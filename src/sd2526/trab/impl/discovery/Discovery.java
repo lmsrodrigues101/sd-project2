@@ -107,7 +107,6 @@ class DiscoveryImpl implements Discovery {
 	public URI[] knownUrisOf(String serviceName, int minEntries) {
 		while(true) {
 			long now = System.currentTimeMillis();
-			// apagar o servidor se ele nao anunciar-se em 5 segundos
 			storedAnnouncements.computeIfPresent(serviceName, (k, set) -> {
 				set.removeIf(info -> (now - info.lastAnnouncement) > DISCOVERY_ANNOUNCE_PERIOD * 5);
 				return set;
@@ -115,7 +114,6 @@ class DiscoveryImpl implements Discovery {
 
 			var res = storedAnnouncements.getOrDefault(serviceName, new ConcurrentSkipListSet<>());
 			if( res.size() >= minEntries ) {
-				// Transforma o TreeSet ordenado num Array de URIs limpinho!
 				return res.stream().map(info -> info.uri).toArray(URI[]::new);
 			} else {
 				Sleep.ms(DISCOVERY_ANNOUNCE_PERIOD);
@@ -142,8 +140,8 @@ class DiscoveryImpl implements Discovery {
 							storedAnnouncements.compute(serviceName, (k, v) -> {
 								if (v == null) v = new ConcurrentSkipListSet<>();
 								ServerInfo newInfo = new ServerInfo(uri, System.currentTimeMillis());
-								v.remove(newInfo); // Remove o antigo (baseado no equals do URI)
-								v.add(newInfo);    // Adiciona o novo com o timestamp atualizado
+								v.remove(newInfo);
+								v.add(newInfo);
 								return v;
 							});}
 
