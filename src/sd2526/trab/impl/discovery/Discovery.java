@@ -8,17 +8,17 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.URI;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 import sd2526.trab.impl.utils.Sleep;
 
 
 /**
- * <p>A class interface to perform service discovery based on periodic 
+ * <p>A class interface to perform service discovery based on periodic
  * announcements over multicast communication.</p>
- * 
+ *
  */
 
 public interface Discovery {
@@ -51,7 +51,7 @@ public interface Discovery {
  * Implementation of the multicast discovery service
  */
 class DiscoveryImpl implements Discovery {
-	
+
 	private static Logger Log = Logger.getLogger(Discovery.class.getName());
 
 	static final int DISCOVERY_RETRY_TIMEOUT = 5000;
@@ -65,15 +65,15 @@ class DiscoveryImpl implements Discovery {
 
 	private static Discovery singleton;
 
-	private final Map<String, TreeSet<ServerInfo>> storedAnnouncements = new ConcurrentHashMap<>();
-	
+	private final Map<String, ConcurrentSkipListSet<ServerInfo>> storedAnnouncements = new ConcurrentHashMap<>();
+
 	synchronized static Discovery getInstance() {
 		if (singleton == null) {
 			singleton = new DiscoveryImpl();
 		}
 		return singleton;
 	}
-		
+
 	private DiscoveryImpl() {
 		this.startListener();
 	}
@@ -113,7 +113,7 @@ class DiscoveryImpl implements Discovery {
 				return set;
 			});
 
-			var res = storedAnnouncements.getOrDefault(serviceName, new TreeSet<>());
+			var res = storedAnnouncements.getOrDefault(serviceName, new ConcurrentSkipListSet<>());
 			if( res.size() >= minEntries ) {
 				// Transforma o TreeSet ordenado num Array de URIs limpinho!
 				return res.stream().map(info -> info.uri).toArray(URI[]::new);
@@ -127,7 +127,7 @@ class DiscoveryImpl implements Discovery {
 		Log.info(String.format("Starting discovery on multicast group: %s, port: %d\n", DISCOVERY_ADDR.getAddress(), DISCOVERY_ADDR.getPort()));
 
 		new Thread(() -> {
-			try (var ms = new MulticastSocket(DISCOVERY_ADDR.getPort())) {				
+			try (var ms = new MulticastSocket(DISCOVERY_ADDR.getPort())) {
 				ms.joinGroup(DISCOVERY_ADDR, pickMulticastInterface(DISCOVERY_ADDR));
 				for (;;) {
 					try {
@@ -140,7 +140,7 @@ class DiscoveryImpl implements Discovery {
 							var serviceName = parts[0];
 							var uri = URI.create(parts[1]);
 							storedAnnouncements.compute(serviceName, (k, v) -> {
-								if (v == null) v = new TreeSet<>();
+								if (v == null) v = new ConcurrentSkipListSet<>();
 								ServerInfo newInfo = new ServerInfo(uri, System.currentTimeMillis());
 								v.remove(newInfo); // Remove o antigo (baseado no equals do URI)
 								v.add(newInfo);    // Adiciona o novo com o timestamp atualizado
@@ -156,8 +156,8 @@ class DiscoveryImpl implements Discovery {
 			}
 		}).start();
 	}
-	
-	private NetworkInterface pickMulticastInterface(InetSocketAddress group) throws IOException {		
+
+	private NetworkInterface pickMulticastInterface(InetSocketAddress group) throws IOException {
 		try(var tmp = new DatagramSocket()){
 			tmp.connect(group);
 			return NetworkInterface.getByInetAddress(tmp.getLocalAddress());
