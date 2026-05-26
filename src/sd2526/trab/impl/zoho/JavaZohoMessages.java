@@ -142,9 +142,7 @@ public class JavaZohoMessages extends JavaBaseService implements Messages, Admin
         try { deleteAllZohoMessages(); return Result.ok(); } catch (Exception e) { return error(INTERNAL_ERROR); }
     }
 
-    // =======================================================================
-    // HELPERS (CORRIGIDOS)
-    // =======================================================================
+
 
     private String fetchAccountId() throws Exception {
         OAuthRequest request = new OAuthRequest(Verb.GET, ZOHO_API_BASE);
@@ -187,7 +185,7 @@ public class JavaZohoMessages extends JavaBaseService implements Messages, Admin
         m.setSubject(subject);
         m.setContents(parts[0].trim());
 
-        // AQUI ESTAVA O PROBLEMA: LER TODOS OS METADADOS
+
         for (String line : parts[1].split("\n")) {
             line = line.trim();
             if (line.startsWith("id:")) m.setId(line.substring(3).trim());
