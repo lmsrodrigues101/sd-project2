@@ -8,9 +8,9 @@ import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.net.URI;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
-import java.util.concurrent.ConcurrentSkipListSet;
 
 import sd2526.trab.impl.utils.Sleep;
 
@@ -64,8 +64,7 @@ class DiscoveryImpl implements Discovery {
 	private static final int MAX_DATAGRAM_SIZE = 65536;
 
 	private static Discovery singleton;
-
-	private final Map<String, ConcurrentSkipListSet<ServerInfo>> storedAnnouncements = new ConcurrentHashMap<>();
+	private final Map<String, TreeSet<ServerInfo>> storedAnnouncements = new ConcurrentHashMap<>();
 
 	synchronized static Discovery getInstance() {
 		if (singleton == null) {
@@ -108,13 +107,20 @@ class DiscoveryImpl implements Discovery {
 		while(true) {
 			long now = System.currentTimeMillis();
 			storedAnnouncements.computeIfPresent(serviceName, (k, set) -> {
-				set.removeIf(info -> (now - info.lastAnnouncement) > DISCOVERY_ANNOUNCE_PERIOD * 5);
+				synchronized (set) {
+					set.removeIf(info -> (now - info.lastAnnouncement) > DISCOVERY_ANNOUNCE_PERIOD * 5);
+				}
 				return set;
 			});
 
-			var res = storedAnnouncements.getOrDefault(serviceName, new ConcurrentSkipListSet<>());
-			if( res.size() >= minEntries ) {
-				return res.stream().map(info -> info.uri).toArray(URI[]::new);
+			var res = storedAnnouncements.getOrDefault(serviceName, new TreeSet<>());
+			URI[] uris;
+			synchronized (res) {
+				uris = res.stream().map(info -> info.uri).toArray(URI[]::new);
+			}
+
+			if( uris.length >= minEntries ) {
+				return uris;
 			} else {
 				Sleep.ms(DISCOVERY_ANNOUNCE_PERIOD);
 			}
@@ -138,10 +144,12 @@ class DiscoveryImpl implements Discovery {
 							var serviceName = parts[0];
 							var uri = URI.create(parts[1]);
 							storedAnnouncements.compute(serviceName, (k, v) -> {
-								if (v == null) v = new ConcurrentSkipListSet<>();
-								ServerInfo newInfo = new ServerInfo(uri, System.currentTimeMillis());
-								v.remove(newInfo);
-								v.add(newInfo);
+								if (v == null) v = new TreeSet<>();
+								synchronized (v) {
+									ServerInfo newInfo = new ServerInfo(uri, System.currentTimeMillis());
+									v.remove(newInfo);
+									v.add(newInfo);
+								}
 								return v;
 							});}
 
